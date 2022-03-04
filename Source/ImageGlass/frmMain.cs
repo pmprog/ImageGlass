@@ -4349,6 +4349,10 @@ namespace ImageGlass {
                 mnuContext.Items.Add(UI.Menu.Clone(mnuMainMoveToRecycleBin));
 
                 mnuContext.Items.Add(new ToolStripSeparator());//------------
+                mnuContext.Items.Add(UI.Menu.Clone(mnuSetQuickCopyDst));
+                mnuContext.Items.Add(UI.Menu.Clone(mnuQuickCopy));
+
+                mnuContext.Items.Add(new ToolStripSeparator());//------------
                 mnuContext.Items.Add(UI.Menu.Clone(mnuMainCopyImagePath));
                 mnuContext.Items.Add(UI.Menu.Clone(mnuMainImageLocation));
                 mnuContext.Items.Add(UI.Menu.Clone(mnuMainImageProperties));
@@ -5648,15 +5652,28 @@ namespace ImageGlass {
         }
 
 
-
-
-
-
-
-
-
         #endregion
 
+        System.IO.DirectoryInfo targetdir = null;
+
+        private void mnuSetQuickCopyDst_Click(object sender, EventArgs e) {
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+            fbd.RootFolder = Environment.SpecialFolder.MyComputer;
+            if(fbd.ShowDialog() == DialogResult.OK) {
+                targetdir = new DirectoryInfo(fbd.SelectedPath);
+            }
+        }
+
+        private void mnuQuickCopy_Click(object sender, EventArgs e) {
+            if(targetdir == null) { mnuSetQuickCopyDst_Click(sender, e); }
+            try {
+                System.IO.FileInfo fi = new FileInfo(Local.ImageList.GetFileName(Local.CurrentIndex));
+                string targetname = fi.Name;
+                if (targetname.StartsWith("IMG_")) { targetname = targetname.Substring(4); }
+                System.IO.File.Copy(fi.FullName, System.IO.Path.Combine(targetdir.FullName, fi.Name));
+            }
+            catch { }
+        }
     }
 
 
